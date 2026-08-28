@@ -9,23 +9,22 @@ import { caseCriticality, presentCase } from "./aging.ts";
 test("ghost 107 is hollow and blocked from engineer work", () => {
   const rec = ingestXml(GHOST_XML, "ghost.xml");
   assert.equal(rec.tar.description.includes("Box failed"), true);
-  assert.ok(rec.hollowness >= 80, `expected hollow, got ${rec.hollowness}`);
+  assert.equal(rec.hollowness, 100);
   assert.equal(hollownessBand(rec.hollowness), "hollow");
   assert.equal(rec.status, "ingested");
   assert.equal(canTransition(rec.status, "awaiting-context", "fsr", rec.hollowness), true);
   assert.equal(canTransition(rec.status, "in-resolution", "engineer", rec.hollowness), false);
   assert.equal(canTransition(rec.status, "closed", "qa", rec.hollowness), false);
-  assert.ok(rec.questions.length >= 8);
+  assert.equal(rec.gaps.length, 5);
 });
 
-test("thin 107 still demands callback for SN, OFP, evidence", () => {
+test("thin 107 only needs log disposition to clear triage", () => {
   const rec = ingestXml(THIN_XML, "thin.xml");
   const fields = rec.gaps.map((g) => g.field);
-  assert.ok(fields.includes("serialNumber"));
-  assert.ok(fields.includes("ofp"));
-  assert.ok(fields.includes("evidence"));
+  assert.deepEqual(fields, ["evidence"]);
+  assert.equal(rec.hollowness, 20);
+  assert.equal(hollownessBand(rec.hollowness), "solid");
   assert.equal(rec.status, "ingested");
-  assert.equal(hollownessBand(rec.hollowness), "thin");
 });
 
 test("solid 107 stays ingested until FSR triages", () => {
@@ -76,22 +75,14 @@ test("QA cannot close while hollowness is above the gate", () => {
   assert.equal(canTransition("awaiting-context", "rejected", "qa", 90), false);
 });
 
-test("filling ghost fields drops hollowness", () => {
+test("filling ghost triage fields drops hollowness", () => {
   const rec = ingestXml(GHOST_XML, "ghost.xml");
   const filled = {
     ...rec.tar,
-    requestType: "TAR" as const,
     unit: "77 MXS",
     pocName: "SSgt Reyes",
-    mds: "XX-9",
-    partNumber: "NAV-12A",
-    serialNumber: "SN-14",
-    ofp: "12.3",
     description:
       "NAV align fail after cold soak on GPS-1 only. Warm start and GPS-2 succeed. BIT 0x1A latches below -15 C.",
-    firstSeen: "2026-08-18",
-    lastKnownGood: "2026-07-02",
-    alreadyTried: "Power cycle; swapped GPS-2 known-good.",
     missionImpact: "Cannot accept GPS-1 for envelope expansion.",
     logAttached: true,
   };
@@ -110,6 +101,14 @@ test("nextActions are role-gated", () => {
   const eng = nextActions(rec, "engineer").map((a) => a.to);
   assert.equal(eng.includes("in-resolution"), true);
   assert.equal(eng.includes("closed"), false);
+});
+
+test("missing log reason satisfies evidence gap", () => {
+  const rec = ingestXml(GHOST_XML, "ghost.xml");
+  assert.equal(rec.gaps.some((g) => g.field === "evidence"), true);
+  const filled = { ...rec.tar, noLogReason: "Unit could not reproduce; no BIT file saved." };
+  const scored = scoreTar(filled);
+  assert.equal(scored.gaps.some((g) => g.field === "evidence"), false);
 });
 
 test("N/A no-log reason satisfies evidence gap", () => {
@@ -170,6 +169,6 @@ test("response XML carries status and callback questions", () => {
   const xml = toResponseXml(rec, Date.parse("2026-08-28T16:00:00Z"));
   assert.match(xml, /<TechnicalAssistanceResponse>/);
   assert.match(xml, /<purpose>callback<\/purpose>/);
-  assert.match(xml, /<question field="serialNumber">/);
+  assert.match(xml, /<question field="unit">/);
 });
 

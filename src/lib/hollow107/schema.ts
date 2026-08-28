@@ -1,15 +1,9 @@
 /** Canonical 107 fields. Inspired by T.O. 00-25-107 content, not an official schema. */
 
 export const REQUIRED_FIELDS = [
-  "requestType",
   "unit",
   "pocName",
-  "serialNumber",
-  "ofp",
   "description",
-  "firstSeen",
-  "lastKnownGood",
-  "alreadyTried",
   "missionImpact",
   "evidence",
 ] as const;
@@ -70,7 +64,7 @@ export type Tar107 = {
 };
 
 export type Gap = {
-  field: RequiredField | "identity";
+  field: RequiredField;
   label: string;
   why: string;
 };

@@ -1,19 +1,32 @@
-import { useState } from "react";
-import { LABELS, NO_LOG_NA, canPatchTar, type CaseRecord, type RequestType, type Tar107 } from "@/lib/hollow107";
-import { useCaseMutations } from "@/hooks/use-ops";
+import { useMemo, useState } from "react";
+import {
+  LABELS,
+  NO_LOG_NA,
+  TRIAGE_FIELDS,
+  TRIAGE_FIELD_COUNT,
+  canPatchTar,
+  logDisposition,
+  type CaseRecord,
+  type LogDisposition,
+  type Tar107,
+  type TriageField,
+  triageSuggestions,
+} from "@/lib/hollow107";
+import { useCaseMutations, useOpsCases } from "@/hooks/use-ops";
 import { useOpsUi } from "@/store/ops";
 import { cn } from "@/lib/utils";
-
-const TRIAGE_FIELDS = 12;
 
 type Props = { rec: CaseRecord };
 
 export function GapFill({ rec }: Props) {
   const mutate = useCaseMutations(rec.id);
   const role = useOpsUi((s) => s.role);
+  const { data: cases } = useOpsCases();
+  const suggestions = useMemo(() => triageSuggestions(cases ?? []), [cases]);
   const editable = canPatchTar(role, rec.status);
-  const done = TRIAGE_FIELDS - rec.gaps.length;
-  const completePct = Math.round((done / TRIAGE_FIELDS) * 100);
+  const done = TRIAGE_FIELD_COUNT - rec.gaps.length;
+  const completePct = Math.round((done / TRIAGE_FIELD_COUNT) * 100);
+  const gapFields = new Set(rec.gaps.map((g) => g.field));
 
   if (!editable) {
     return (
@@ -41,7 +54,7 @@ export function GapFill({ rec }: Props) {
         <div className="flex items-center justify-between gap-3 text-xs">
           <span className="font-mono tracking-widest text-fg-subtle uppercase">Triage walkthrough</span>
           <span className="tabular-nums text-fg-muted">
-            {done}/{TRIAGE_FIELDS} required · {rec.hollowness}% hollow
+            {done}/{TRIAGE_FIELD_COUNT} required · {rec.hollowness}% hollow
           </span>
         </div>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-bg-elevated" aria-hidden>
@@ -49,20 +62,42 @@ export function GapFill({ rec }: Props) {
         </div>
       </div>
 
-      {rec.gaps.map((gap) => {
-        const question = rec.questions.find((q) => q.field === gap.field)?.question ?? `Provide ${gap.label}.`;
+      {TRIAGE_FIELDS.map((field) => {
+        const gap = rec.gaps.find((g) => g.field === field);
+        const question =
+          rec.questions.find((q) => q.field === field)?.question ?? `Provide ${LABELS[field]}.`;
+        const complete = !gapFields.has(field);
         return (
-          <div key={gap.field} className="rounded-md border border-border bg-bg-elevated px-3 py-2.5">
+          <div
+            key={field}
+            className={cn(
+              "rounded-md border px-3 py-2.5",
+              complete ? "border-ok/30 bg-ok/5" : "border-border bg-bg-elevated",
+            )}
+          >
             <div className="mb-1.5 flex items-center gap-2">
               <span className="font-mono text-[10px] tracking-widest text-accent uppercase">
-                {LABELS[gap.field] ?? gap.label}
+                {LABELS[field]}
               </span>
-              <span className="rounded-sm bg-warn/15 px-1.5 py-0.5 font-mono text-[9px] tracking-wider text-warn uppercase">
-                Required
-              </span>
-              <FieldInfo label={gap.label} why={gap.why} question={question} />
+              {!complete && (
+                <span className="rounded-sm bg-warn/15 px-1.5 py-0.5 font-mono text-[9px] tracking-wider text-warn uppercase">
+                  Required
+                </span>
+              )}
+              {complete && (
+                <span className="rounded-sm bg-ok/15 px-1.5 py-0.5 font-mono text-[9px] tracking-wider text-ok uppercase">
+                  Done
+                </span>
+              )}
+              <FieldInfo label={LABELS[field]} why={gap?.why ?? ""} question={question} />
             </div>
-            <GapInput rec={rec} field={gap.field} onApply={apply} />
+            <TriageInput
+              rec={rec}
+              field={field}
+              onApply={apply}
+              units={suggestions.units}
+              pocs={suggestions.pocs}
+            />
           </div>
         );
       })}
@@ -72,6 +107,7 @@ export function GapFill({ rec }: Props) {
 
 function FieldInfo({ label, why, question }: { label: string; why: string; question: string }) {
   const [open, setOpen] = useState(false);
+  if (!why) return null;
   return (
     <div className="ms-auto">
       <button
@@ -98,108 +134,106 @@ function FieldInfo({ label, why, question }: { label: string; why: string; quest
   );
 }
 
-function GapInput({
+function TriageInput({
   rec,
   field,
   onApply,
+  units,
+  pocs,
 }: {
   rec: CaseRecord;
-  field: string;
+  field: TriageField;
   onApply: (patch: Partial<Tar107>) => void;
+  units: string[];
+  pocs: string[];
 }) {
   const tar = rec.tar;
   const inputClass = "min-h-9 w-full rounded-md border border-border-strong bg-bg px-2.5 text-sm";
+  const listId = `${rec.id}-${field}-suggestions`;
 
-  if (field === "requestType") {
-    return (
-      <select
-        className={inputClass}
-        value={tar.requestType}
-        onChange={(e) => onApply({ requestType: e.target.value as RequestType })}
-      >
-        <option value="">Select…</option>
-        <option value="TAR">TAR — engineering disposition</option>
-        <option value="MAR">MAR — depot maintenance</option>
-      </select>
-    );
-  }
-  if (field === "identity") {
-    return (
-      <div className="grid gap-2 sm:grid-cols-2">
-        <input
-          className={inputClass}
-          placeholder="MDS"
-          defaultValue={tar.mds}
-          onBlur={(e) => onApply({ mds: e.target.value })}
-        />
-        <input
-          className={inputClass}
-          placeholder="Part number"
-          defaultValue={tar.partNumber}
-          onBlur={(e) => onApply({ partNumber: e.target.value })}
-        />
-      </div>
-    );
-  }
   if (field === "evidence") {
-    const naSelected = tar.noLogReason.trim() === NO_LOG_NA;
+    return <LogPicker tar={tar} onApply={onApply} />;
+  }
+
+  if (field === "unit" || field === "pocName") {
+    const options = field === "unit" ? units : pocs;
     return (
-      <div className="space-y-2">
-        <label className="flex min-h-9 items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={tar.logAttached}
-            onChange={(e) => onApply({ logAttached: e.target.checked, noLogReason: e.target.checked ? "" : tar.noLogReason })}
-          />
-          Log attached
-        </label>
-        {!tar.logAttached && (
-          <>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => onApply({ logAttached: false, noLogReason: NO_LOG_NA })}
-                className={cn(
-                  "min-h-9 rounded-md border px-3 text-xs font-medium",
-                  naSelected
-                    ? "border-accent/50 bg-accent/15 text-accent"
-                    : "border-border text-fg-muted hover:border-border-strong",
-                )}
-              >
-                N/A — no digital interface
-              </button>
-            </div>
-            {!naSelected && (
-              <input
-                className={inputClass}
-                placeholder="Why is there no log?"
-                defaultValue={tar.noLogReason}
-                onBlur={(e) => onApply({ noLogReason: e.target.value })}
-              />
-            )}
-          </>
-        )}
-      </div>
+      <>
+        <input
+          className={inputClass}
+          list={listId}
+          defaultValue={field === "unit" ? tar.unit : tar.pocName}
+          placeholder={field === "unit" ? "e.g. 77 MXS" : "e.g. SSgt Reyes"}
+          onBlur={(e) => onApply({ [field]: e.target.value } as Partial<Tar107>)}
+        />
+        <datalist id={listId}>
+          {options.map((value) => (
+            <option key={value} value={value} />
+          ))}
+        </datalist>
+      </>
     );
   }
-  const key = field as keyof Tar107;
-  const value = String(tar[key] ?? "");
-  const multiline = field === "description" || field === "alreadyTried" || field === "missionImpact";
-  if (multiline) {
-    return (
-      <textarea
-        rows={2}
-        className={cn(inputClass, "py-2")}
-        defaultValue={value}
-        onBlur={(e) => onApply({ [key]: e.target.value } as Partial<Tar107>)}
-      />
-    );
-  }
+
+  const value = field === "description" ? tar.description : tar.missionImpact;
   return (
-    <input
-      className={inputClass}
+    <textarea
+      rows={field === "description" ? 3 : 2}
+      className={cn(inputClass, "py-2")}
       defaultValue={value}
-      onBlur={(e) => onApply({ [key]: e.target.value } as Partial<Tar107>)}
+      placeholder={
+        field === "description"
+          ? "What failed, when, and in what mode?"
+          : "Emergency vs routine — what is blocked?"
+      }
+      onBlur={(e) => onApply({ [field]: e.target.value } as Partial<Tar107>)}
     />
+  );
+}
+
+function LogPicker({ tar, onApply }: { tar: Tar107; onApply: (patch: Partial<Tar107>) => void }) {
+  const mode = logDisposition(tar);
+  const inputClass = "min-h-9 w-full rounded-md border border-border-strong bg-bg px-2.5 text-sm";
+
+  function pick(next: LogDisposition) {
+    if (next === "attached") onApply({ logAttached: true, noLogReason: "" });
+    if (next === "na") onApply({ logAttached: false, noLogReason: NO_LOG_NA });
+    if (next === "missing") onApply({ logAttached: false, noLogReason: tar.noLogReason === NO_LOG_NA ? "" : tar.noLogReason });
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {(
+          [
+            { id: "attached", label: "Log attached" },
+            { id: "missing", label: "Missing log" },
+            { id: "na", label: "N/A" },
+          ] as const
+        ).map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            onClick={() => pick(option.id)}
+            className={cn(
+              "min-h-9 rounded-md border px-3 text-xs font-medium",
+              mode === option.id
+                ? "border-accent/50 bg-accent/15 text-accent"
+                : "border-border text-fg-muted hover:border-border-strong",
+            )}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      {mode === "missing" && (
+        <input
+          className={inputClass}
+          placeholder="Why is the log missing?"
+          defaultValue={tar.noLogReason === NO_LOG_NA ? "" : tar.noLogReason}
+          onBlur={(e) => onApply({ logAttached: false, noLogReason: e.target.value })}
+        />
+      )}
+    </div>
   );
 }

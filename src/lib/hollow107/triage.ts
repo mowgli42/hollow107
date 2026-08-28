@@ -1,37 +1,31 @@
 import type { CallbackQuestion, Gap, Tar107 } from "./schema.ts";
 
+export const TRIAGE_FIELD_COUNT = 5;
+
+export const TRIAGE_FIELDS = ["unit", "pocName", "description", "missionImpact", "evidence"] as const;
+
+export type TriageField = (typeof TRIAGE_FIELDS)[number];
+
 export const LABELS: Record<string, string> = {
-  requestType: "TAR vs MAR",
   unit: "Unit",
   pocName: "Point of contact",
-  identity: "MDS or part number",
-  serialNumber: "Serial number",
-  ofp: "OFP / software load",
   description: "Discrepancy description",
-  firstSeen: "First seen",
-  lastKnownGood: "Last known good",
-  alreadyTried: "Already tried",
   missionImpact: "Mission impact",
-  evidence: "Log or no-log reason",
+  evidence: "Log",
 };
 
-export const WHY: Record<string, string> = {
-  requestType: "Routing differs for engineering disposition vs depot maintenance.",
+export const WHY: Record<TriageField, string> = {
   unit: "No one to call back.",
   pocName: "A 107 without a name dies in the queue.",
-  identity: "Cannot retrieve the right ICD or Brain Book slice.",
-  serialNumber: "Config-specific faults (ECO, harness) hide without SN.",
-  ofp: "Same symptom, different OFP, different cause.",
   description: '"Box failed" is not a discrepancy.',
-  firstSeen: "Needed for change analysis.",
-  lastKnownGood: "Needed for change analysis.",
-  alreadyTried: "Stops repeating ATP steps the field already burned.",
   missionImpact: "Sets emergency vs routine.",
-  evidence: "Without a log, an N/A reason, or a no-log explanation, signatures cannot match.",
+  evidence: "Attach a log, mark it missing with a reason, or choose N/A for parts with no digital interface.",
 };
 
 /** Quick-fill when the part has no log-capable interface. */
 export const NO_LOG_NA = "N/A — no digital interface on this physical part";
+
+export type LogDisposition = "attached" | "missing" | "na";
 
 function descriptionOk(text: string): boolean {
   const t = text.trim();
@@ -41,34 +35,40 @@ function descriptionOk(text: string): boolean {
   return true;
 }
 
-export function hasIdentity(tar: Tar107): boolean {
-  return Boolean(tar.mds.trim() || tar.partNumber.trim());
+export function logDisposition(tar: Tar107): LogDisposition | null {
+  if (tar.logAttached) return "attached";
+  const reason = tar.noLogReason.trim();
+  if (reason === NO_LOG_NA) return "na";
+  if (reason) return "missing";
+  return null;
 }
 
 export function hasEvidence(tar: Tar107): boolean {
-  return tar.logAttached || Boolean(tar.noLogReason.trim());
+  return logDisposition(tar) !== null;
 }
 
+function fieldPresent(field: TriageField, tar: Tar107): boolean {
+  switch (field) {
+    case "unit":
+      return Boolean(tar.unit.trim());
+    case "pocName":
+      return Boolean(tar.pocName.trim());
+    case "description":
+      return descriptionOk(tar.description);
+    case "missionImpact":
+      return Boolean(tar.missionImpact.trim());
+    case "evidence":
+      return hasEvidence(tar);
+  }
+}
+
+/** Triage-required gaps only (unit, POC, description, mission impact, log). */
 export function findGaps(tar: Tar107): Gap[] {
   const gaps: Gap[] = [];
-  const present: Record<string, boolean> = {
-    requestType: Boolean(tar.requestType),
-    unit: Boolean(tar.unit.trim()),
-    pocName: Boolean(tar.pocName.trim()),
-    identity: hasIdentity(tar),
-    serialNumber: Boolean(tar.serialNumber.trim()),
-    ofp: Boolean(tar.ofp.trim()),
-    description: descriptionOk(tar.description),
-    firstSeen: Boolean(tar.firstSeen.trim()),
-    lastKnownGood: Boolean(tar.lastKnownGood.trim()),
-    alreadyTried: Boolean(tar.alreadyTried.trim()),
-    missionImpact: Boolean(tar.missionImpact.trim()),
-    evidence: hasEvidence(tar),
-  };
-  for (const field of Object.keys(present) as Array<keyof typeof present>) {
-    if (!present[field]) {
+  for (const field of TRIAGE_FIELDS) {
+    if (!fieldPresent(field, tar)) {
       gaps.push({
-        field: field as Gap["field"],
+        field,
         label: LABELS[field],
         why: WHY[field],
       });
@@ -77,32 +77,39 @@ export function findGaps(tar: Tar107): Gap[] {
   return gaps;
 }
 
-/** 0 = complete, 100 = empty. This is the "how bad is this 107" meter. */
-export function hollowness(gaps: Gap[], requiredCount = 12): number {
+/** 0 = complete, 100 = empty. Hollowness is triage completeness. */
+export function hollowness(gaps: Gap[], requiredCount = TRIAGE_FIELD_COUNT): number {
   return Math.round((gaps.length / requiredCount) * 100);
 }
 
 export function callbackQuestions(gaps: Gap[]): CallbackQuestion[] {
-  const q: Record<string, string> = {
-    requestType: "Is this a TAR (engineering disposition) or a MAR (depot maintenance)?",
+  const q: Record<TriageField, string> = {
     unit: "What unit and site should we call back?",
     pocName: "Who is the POC, and how do we reach them?",
-    identity: "What is the MDS and/or part number?",
-    serialNumber: "What is the serial number on the unit?",
-    ofp: "What OFP / software hash is loaded?",
     description: "Describe the discrepancy in one operational sentence (what failed, when, in what mode).",
-    firstSeen: "When was this first seen?",
-    lastKnownGood: "When was the last known-good employment of this SN?",
-    alreadyTried: "What have you already tried, and what happened?",
     missionImpact: "What is the mission impact (emergency vs routine)?",
-    evidence:
-      "Attach a log excerpt, choose N/A for parts with no digital interface, or state why no log exists.",
+    evidence: "Attach a log, mark it missing with a reason, or choose N/A.",
   };
-  return gaps.map((g) => ({ field: g.field, question: q[g.field] ?? `Provide ${g.label}.` }));
+  return gaps.map((g) => ({ field: g.field, question: q[g.field as TriageField] ?? `Provide ${g.label}.` }));
 }
 
 export function hollownessBand(score: number): "solid" | "thin" | "hollow" {
   if (score <= 20) return "solid";
   if (score <= 55) return "thin";
   return "hollow";
+}
+
+export function triageSuggestions(cases: { tar: Tar107 }[]) {
+  const units = new Set<string>();
+  const pocs = new Set<string>();
+  for (const { tar } of cases) {
+    const unit = tar.unit.trim();
+    const poc = tar.pocName.trim();
+    if (unit) units.add(unit);
+    if (poc) pocs.add(poc);
+  }
+  return {
+    units: [...units].sort((a, b) => a.localeCompare(b)),
+    pocs: [...pocs].sort((a, b) => a.localeCompare(b)),
+  };
 }
