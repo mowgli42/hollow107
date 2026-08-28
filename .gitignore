@@ -23,3 +23,5 @@ artifacts/
 .grok/og-pending
 .project_id
 .node_modules.lock
+data/processed/
+data/failed/

@@ -2,7 +2,7 @@
 
 Ordered. Do **not** implement these in the prototype. Each bead is "what we would do differently if this had to survive real users."
 
-1. **Durable persistence** — Replace localStorage with a real store (Postgres / Neon). Concurrent writers, case IDs that survive devices. Alternative considered in the prototype: SQLite. Rejected for a zero-ops demo.
+1. **Durable persistence** — Cases now live in PGLite (preview) / Neon (`DATABASE_URL`). Folder import still resets when the in-memory PGLite process dies. File-backed PGLite or always-on Neon is the remaining gap. Concurrent writers and stable IDs across devices: done for the API surface.
 
 2. **Real roles** — CAC / OIDC groups for FSR, engineering, QA. The header toggle is a teaching device and a security hole.
 

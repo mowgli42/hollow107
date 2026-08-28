@@ -1,42 +1,63 @@
 # Hollow107
 
-**See how empty a field 107 really is.**
-
-A graham-bell prototype for inbound T.O. 00-25-107 TAR/MAR triage. Ingest invented TAR XML, score **hollowness** (how empty the request is), force callback on missing context, then run a resolution workflow with different views for FSR, engineer, and QA.
+TAR/MAR triage queue. Ingest a 107 as XML, keep users/timeline/logs on the envelope, and show **status, unanswered time, and criticality** on every row.
 
 Live: [hollow107.vercel.app](https://hollow107.vercel.app)
 
-This is not a technical order, not JDRS, and not an airworthy disposition. The XML schema is invented because no public 107 schema exists.
+Not a technical order, not JDRS, not an airworthy disposition. Invented `TechnicalAssistanceRequest` schema.
 
-## Why it exists
+## Use it
 
-GitHub has no dedicated open-source tool for 107s or field-service-rep requests. JDRS and IMDS are closed. Searches for “FSR” return AMD FidelityFX Super Resolution. Knowledge generated in lab and flight test still reaches the field as a procedure and a hollow form.
+- **Queue** `/` — open work, darkest first (criticality then wait).
+- **Ingest** `/ingest` — paste/drop XML, or scan `data/inbox`.
+- **Teams** `/t/fsr` `/t/engineer` `/t/qa` `/t/ops` — filtered landings. Create more with `POST /api/teams`.
+- **Case** `/cases/:id` — workbench + envelope (people, timeline, logs, XML).
 
-Hollow107 makes the emptiness visible first.
+Status chips are labeled (not color-only). The strip under the header is the live ingest/queue status.
 
-## What the prototype validates
+## Import
 
-- Ghost 107 (“Box failed. Please advise ASAP.”) scores hollow and **cannot** be diagnosed.
-- Thin 107s still demand SN, OFP, last-known-good, and evidence.
-- Solid 107s flow FSR → engineer (hypotheses + kill-checks) → QA close.
-- QA cannot close a hollow case. Engineer cannot start one.
+| Door | How |
+|---|---|
+| Webpage | paste or drop `.xml` |
+| Folder | `data/inbox/*.xml` then **Scan inbox folder**, or `npm run import:watch` |
+| API | `POST /api/ingest` (XML, JSON `{xml,sourceName}`, or multipart) |
 
-What it does **not** do (see `beads/roadmap.md`): Nemotron callbacks, Brain Book signature match, real log decode, CAC roles, durable persistence, official JDRS schema.
+Folder import is local. Vercel has no inbox; use the webpage or the API.
+
+## Team APIs
+
+```
+GET  /api/teams
+POST /api/teams          # { slug, name, role, blurb, statuses[], unitFilter? }
+GET  /api/teams/:slug
+GET  /api/teams/:slug/cases
+GET  /api/cases
+GET  /api/cases/:id
+GET  /api/cases/:id/envelope
+GET  /api/cases/:id/response.xml
+GET  /api/status
+POST /api/ingest
+POST /api/import/folder  # local only
+```
+
+## Data plan
+
+XML in/out. Envelope beside it. See `docs/DATA-PLAN.md`.
 
 ## Stack
 
-TanStack Start, React 19, Tailwind v4, Zustand (localStorage). Completeness scoring is pure functions — no GPU, no LLM in this slice.
+TanStack Start, React 19, Tailwind v4, PGLite (or Neon when `DATABASE_URL` is set). Auth off; rows unowned.
 
 ## Specs
 
 | Artifact | Path |
 |---|---|
 | OpenSpec | `openspec/` |
-| Gherkin (`@validated` / `@future`) | `features/` |
-| Beads (production rebuild) | `beads/roadmap.md` |
-| Demo walkthrough | `DEMO.md` |
-| Learnings | `LEARNINGS.md` |
-| Teaching XML | `public/samples/` |
+| Gherkin | `features/` |
+| Data plan | `docs/DATA-PLAN.md` |
+| Beads | `beads/roadmap.md` |
+| Samples | `public/samples/` |
 
 ## License
 

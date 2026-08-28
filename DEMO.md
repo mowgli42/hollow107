@@ -1,42 +1,25 @@
 # DEMO
 
-Hollow107 — see how empty a field 107 really is.
+Hollow107 — queue, not a pitch.
 
 Live: https://hollow107.vercel.app  
 Repo: https://github.com/mowgli42/hollow107
 
 ## Two-minute path
 
-1. Open the app. The hero already scores the ghost 107 ("Box failed. Please advise ASAP.").
-2. Click **Load teaching set**. You land on the queue, hollow first.
-3. Open the ghost case. Twelve gaps, engineer start is locked. Switch the header to **Engineer** — still locked. That is the point.
-4. Switch back to **FSR**. Open the solid case (GPS-1 cold soak). Switch to **Engineer**, **Start resolution**, add a hypothesis + kill-check, **Submit for QA**.
-5. Switch to **QA**. Read the notes. **Close**. Try the same close on the ghost (still hollow) — it will refuse.
+1. Open the app. Dark queue, status strip at the top.
+2. **Load samples**. Ghost (emergency, unanswered since 12 Aug) should show **Critical** and a long wait.
+3. Open the ghost. Envelope tab: submitter, timeline, inbound XML. Work tab: FSR fills gaps; engineer start stays locked.
+4. Open the solid case. Switch to **Engineer**, start resolution, add a hypothesis, submit for QA. Switch to **QA**, close.
+5. Open `/t/fsr` vs `/t/engineer` — different landings, same cases, filtered.
 
-Paste or drop your own `TechnicalAssistanceRequest` XML from the ingest page. Samples live at `/samples/ghost.xml`, `/samples/thin.xml`, `/samples/solid.xml`.
-
-## Screenshot walkthrough
-
-| Step | File |
-|---|---|
-| Ingest / ghost hero | `docs/demo/01-ingest.png` |
-| Queue, hollow first | `docs/demo/02-queue.png` |
-| Ghost as FSR — 12 callbacks | `docs/demo/03-ghost-fsr.png` |
-| Ghost as engineer — blocked | `docs/demo/04-ghost-engineer-blocked.png` |
-| Solid as engineer | `docs/demo/05-solid-engineer.png` |
-| Solid as QA | `docs/demo/06-solid-qa.png` |
+Drop `public/samples/ghost.xml` into `data/inbox` and hit **Scan inbox folder** to try folder import.
 
 ## Commands
 
 ```bash
-npm test          # includes src/lib/hollow107/hollow107.test.ts
-npm run dev       # local preview
+npm test
+npm run dev
+npm run import:watch   # sidecar: data/inbox → POST /api/ingest
 npm run build
 ```
-
-## Review without a laptop
-
-- Sample logs: `docs/demo/test-run.log` (unit tests) and `public/samples/solid-gps1.log` (attached field log)
-- OpenSpec: `openspec/`
-- Gherkin: `features/` (`@validated` vs `@future`)
-- Production rebuild: `beads/roadmap.md`

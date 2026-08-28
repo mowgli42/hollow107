@@ -27,8 +27,11 @@ export const WHY: Record<string, string> = {
   lastKnownGood: "Needed for change analysis.",
   alreadyTried: "Stops repeating ATP steps the field already burned.",
   missionImpact: "Sets emergency vs routine.",
-  evidence: "Without a log or a reason, signatures cannot match.",
+  evidence: "Without a log, an N/A reason, or a no-log explanation, signatures cannot match.",
 };
+
+/** Quick-fill when the part has no log-capable interface. */
+export const NO_LOG_NA = "N/A — no digital interface on this physical part";
 
 function descriptionOk(text: string): boolean {
   const t = text.trim();
@@ -92,7 +95,8 @@ export function callbackQuestions(gaps: Gap[]): CallbackQuestion[] {
     lastKnownGood: "When was the last known-good employment of this SN?",
     alreadyTried: "What have you already tried, and what happened?",
     missionImpact: "What is the mission impact (emergency vs routine)?",
-    evidence: "Attach a log excerpt, or state why no log exists.",
+    evidence:
+      "Attach a log excerpt, choose N/A for parts with no digital interface, or state why no log exists.",
   };
   return gaps.map((g) => ({ field: g.field, question: q[g.field] ?? `Provide ${g.label}.` }));
 }
