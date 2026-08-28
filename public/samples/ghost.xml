@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TechnicalAssistanceRequest>
+  <requestType></requestType>
+  <priority>emergency</priority>
+  <submittedAt>2026-08-12</submittedAt>
+  <unit></unit>
+  <site></site>
+  <pocName></pocName>
+  <pocContact></pocContact>
+  <mds></mds>
+  <nsn></nsn>
+  <partNumber></partNumber>
+  <serialNumber></serialNumber>
+  <ofp></ofp>
+  <icd></icd>
+  <toInUse></toInUse>
+  <description>Box failed. Please advise ASAP.</description>
+  <bitCode></bitCode>
+  <firstSeen></firstSeen>
+  <lastKnownGood></lastKnownGood>
+  <alreadyTried></alreadyTried>
+  <missionImpact></missionImpact>
+  <logAttached>false</logAttached>
+  <noLogReason></noLogReason>
+</TechnicalAssistanceRequest>

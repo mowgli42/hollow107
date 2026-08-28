@@ -1,0 +1,36 @@
+{
+  "url": "http://127.0.0.1:8080/",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800,
+      "status": 200,
+      "title": "Hollow107",
+      "hasCanvas": false,
+      "bodyTextLen": 1004,
+      "bodyTextHash": "b8114b137eee2a762f75047900b002dbcfbd68077734050ecb58132676ab1868",
+      "bodyTextPrefix": "HOLLOW107 Field 107 triage FSR Engineer QA Ingest Queue About PR",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview.png"
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844,
+      "status": 200,
+      "title": "Hollow107",
+      "hasCanvas": false,
+      "bodyTextLen": 1004,
+      "bodyTextHash": "b8114b137eee2a762f75047900b002dbcfbd68077734050ecb58132676ab1868",
+      "bodyTextPrefix": "HOLLOW107 Field 107 triage FSR Engineer QA Ingest Queue About PR",
+      "horizontalOverflow": false,
+      "consoleErrors": [],
+      "pageErrors": [],
+      "screenshot": "/workspace/screenshots/app-builder-preview-mobile.png"
+    }
+  },
+  "brandWarnings": [],
+  "authWarnings": [],
+  "verdictFile": "/workspace/screenshots/app-builder-preview.json"
+}

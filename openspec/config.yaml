@@ -1,0 +1,13 @@
+schema: openspec/v1
+name: hollow107
+summary: >
+  Score how empty an inbound T.O. 00-25-107-inspired TAR/MAR is, force
+  callback on missing context, then run a role-gated resolution workflow.
+validated:
+  - ingest-xml
+  - triage-hollowness
+  - resolution-workflow
+future:
+  - nemotron-callbacks
+  - brain-book-signatures
+  - official-jdrs-schema

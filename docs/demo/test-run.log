@@ -1,0 +1,14 @@
+# npm run test:hollow  (2026-08-28)
+TAP version 13
+ok 1 - ghost 107 is hollow and blocked from engineer work
+ok 2 - thin 107 still demands callback for SN, OFP, evidence
+ok 3 - solid 107 is ready for engineer and QA may close after review
+ok 4 - rejects non-TAR XML
+ok 5 - short or slogan description counts as a gap
+ok 6 - FSR cannot send a hollow case to engineering; QA may override
+ok 7 - QA cannot close while hollowness is above the gate
+ok 8 - filling ghost fields drops hollowness
+ok 9 - nextActions are role-gated
+# tests 9
+# pass 9
+# fail 0

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TechnicalAssistanceRequest>
+  <requestType>TAR</requestType>
+  <priority>routine</priority>
+  <submittedAt>2026-08-22T14:03:00Z</submittedAt>
+  <unit>77 MXS</unit>
+  <site>Nellis</site>
+  <pocName>SSgt Reyes</pocName>
+  <pocContact>reyes@example.mil</pocContact>
+  <mds>XX-9</mds>
+  <nsn>5825-01-000-0000</nsn>
+  <partNumber>NAV-12A</partNumber>
+  <serialNumber>SN-14</serialNumber>
+  <ofp>12.3</ofp>
+  <icd>4.2</icd>
+  <toInUse>TO 12P5-XX-1</toInUse>
+  <description>NAV align fail after cold soak on GPS-1 only. Warm start and GPS-2 succeed. BIT 0x1A latches on first power-up below -15 C.</description>
+  <bitCode>0x1A</bitCode>
+  <firstSeen>2026-08-18T06:10:00Z</firstSeen>
+  <lastKnownGood>2026-07-02 after OFP 12.1</lastKnownGood>
+  <alreadyTried>Power cycle; swapped GPS-2 known-good (still fails on GPS-1 path); ran ATP 4.2 align card.</alreadyTried>
+  <missionImpact>Cannot accept GPS-1 for envelope expansion; GPS-2 remains available.</missionImpact>
+  <logAttached>true</logAttached>
+  <noLogReason></noLogReason>
+</TechnicalAssistanceRequest>
