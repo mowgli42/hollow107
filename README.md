@@ -4,6 +4,8 @@
 
 A graham-bell prototype for inbound T.O. 00-25-107 TAR/MAR triage. Ingest invented TAR XML, score **hollowness** (how empty the request is), force callback on missing context, then run a resolution workflow with different views for FSR, engineer, and QA.
 
+Live: [hollow107.vercel.app](https://hollow107.vercel.app)
+
 This is not a technical order, not JDRS, and not an airworthy disposition. The XML schema is invented because no public 107 schema exists.
 
 ## Why it exists

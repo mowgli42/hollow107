@@ -2,6 +2,9 @@
 
 Hollow107 — see how empty a field 107 really is.
 
+Live: https://hollow107.vercel.app  
+Repo: https://github.com/mowgli42/hollow107
+
 ## Two-minute path
 
 1. Open the app. The hero already scores the ghost 107 ("Box failed. Please advise ASAP.").
@@ -33,7 +36,6 @@ npm run build
 
 ## Review without a laptop
 
-- Public GitHub: https://github.com/mowgli42/hollow107
 - Sample logs: `docs/demo/test-run.log` (unit tests) and `public/samples/solid-gps1.log` (attached field log)
 - OpenSpec: `openspec/`
 - Gherkin: `features/` (`@validated` vs `@future`)
