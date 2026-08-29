@@ -1,5 +1,5 @@
 Feature: Role-gated resolution
-  FSR fills, engineer hypothesizes, QA stamps.
+  FSR fills triage, engineer hypothesizes, QA stamps.
 
   @validated
   Scenario: Solid case can close through engineer and QA
@@ -16,10 +16,16 @@ Feature: Role-gated resolution
     And QA cannot close it
 
   @validated
-  Scenario: FSR cannot skip the completeness gate; QA may override
+  Scenario: FSR cannot skip the completeness gate
     Given the ghost 107
     Then FSR cannot send it to the engineer
-    And QA can send it to the engineer
+    And FSR may send it to awaiting-context
+
+  @validated
+  Scenario: QA sends a case back to engineering from review
+    Given a solid 107 in status qa-review
+    Then QA may send it back to ready-for-engineer
+    And FSR may not send it to ready-for-engineer from qa-review
 
   @future
   Scenario: Hypotheses are matched against Brain Book signatures

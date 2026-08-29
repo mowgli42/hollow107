@@ -8,6 +8,7 @@ export const Route = createFileRoute("/")({
       title="In-work"
       stage="open"
       showKanbanToggle
+      showSearch
     />
   ),
 });

@@ -3,7 +3,7 @@ import { test } from "node:test";
 import { GHOST_XML, SOLID_XML, THIN_XML } from "./fixtures.ts";
 import { ingestXml, parseTarXml, scoreTar, toResponseXml } from "./index.ts";
 import { findGaps, hollowness, hollownessBand, NO_LOG_NA } from "./triage.ts";
-import { canTransition, nextActions, workflowSteps } from "./workflow.ts";
+import { canTransition, nextActions, roleGuidance, workflowMoves, workflowSteps } from "./workflow.ts";
 import { caseCriticality, presentCase } from "./aging.ts";
 
 test("ghost 107 is hollow and blocked from engineer work", () => {
@@ -101,6 +101,32 @@ test("nextActions are role-gated", () => {
   const eng = nextActions(rec, "engineer").map((a) => a.to);
   assert.equal(eng.includes("in-resolution"), true);
   assert.equal(eng.includes("closed"), false);
+});
+
+test("roleGuidance is scoped to the active role", () => {
+  const qaReview = roleGuidance("qa", "qa-review");
+  assert.ok(qaReview[0]?.includes("Review engineer notes"));
+
+  const fsrOnReview = roleGuidance("fsr", "qa-review");
+  assert.ok(fsrOnReview[0]?.includes("Triage is complete"));
+
+  const qaWaiting = roleGuidance("qa", "ready-for-engineer");
+  assert.ok(qaWaiting[0]?.includes("unlock"));
+});
+
+test("workflowMoves split forward and backward transitions", () => {
+  const rec = ingestXml(SOLID_XML, "solid.xml");
+  rec.status = "ready-for-engineer";
+  const fsrBack = workflowMoves(rec, "fsr").backward.map((a) => a.to);
+  assert.deepEqual(fsrBack, ["awaiting-context"]);
+
+  rec.status = "in-resolution";
+  const engBack = workflowMoves(rec, "engineer").backward.map((a) => a.to);
+  assert.deepEqual(engBack, ["ready-for-engineer"]);
+
+  rec.status = "qa-review";
+  const qaBack = workflowMoves(rec, "qa").backward.map((a) => a.to);
+  assert.deepEqual(qaBack, ["ready-for-engineer"]);
 });
 
 test("missing log reason satisfies evidence gap", () => {

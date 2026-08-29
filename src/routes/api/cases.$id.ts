@@ -72,11 +72,13 @@ export const Route = createFileRoute("/api/cases/$id")({
           }
           if (body.action === "notes") {
             if (!body.notes) return fail("Need notes.");
+            const existing = await getCase(params.id);
+            if (!existing) return fail("Unknown case", 404);
             if (body.notes.which === "engineerNotes" && !canEditEngineerNotes(role)) {
               return fail("Only engineers can edit engineer notes.");
             }
-            if (body.notes.which === "qaNotes" && !canEditQaNotes(role)) {
-              return fail("Only QA can edit QA notes.");
+            if (body.notes.which === "qaNotes" && !canEditQaNotes(role, existing.status)) {
+              return fail("Only QA can edit QA notes during review.");
             }
             const rec = await setNotes(params.id, body.notes.which, body.notes.value, actor);
             return json({ ok: true, case: presentCase(rec) });

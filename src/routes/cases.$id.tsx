@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CaseResolution } from "@/components/case-resolution";
+import { CaseWorkflowControls } from "@/components/case-workflow-controls";
 import { GapFill } from "@/components/gap-fill";
-import { RequestStatus } from "@/components/request-status";
+import { RequestMetrics } from "@/components/request-status";
+import { StatusSteps } from "@/components/status-steps";
 import { ROLE_LABEL, canPatchTar, type CaseRecord } from "@/lib/hollow107";
 import { useEnvelope } from "@/hooks/use-ops";
 import { useOpsUi } from "@/store/ops";
@@ -14,7 +16,7 @@ function CasePage() {
   const { id } = Route.useParams();
   const { data, isLoading, error } = useEnvelope(id);
   const role = useOpsUi((s) => s.role);
-  const [tab, setTab] = useState<"work" | "envelope">("work");
+  const [tab, setTab] = useState<"request" | "envelope">("request");
 
   if (isLoading) return <p className="text-sm text-fg-muted">Loading case…</p>;
   if (error || !data) {
@@ -33,12 +35,18 @@ function CasePage() {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-4">
-        <p className="font-mono text-xs tracking-widest text-fg-subtle uppercase">
-          {rec.sourceName} · {rec.sourceKind} · viewing as {ROLE_LABEL[role]}
-        </p>
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <p className="font-mono text-xs tracking-widest text-fg-subtle uppercase">
+            {rec.sourceName} · {rec.sourceKind} · viewing as {ROLE_LABEL[role]}
+          </p>
+          <div className="flex flex-col items-end gap-2">
+            <StatusSteps status={rec.status} size="sm" />
+            <CaseWorkflowControls rec={rec} role={role} />
+          </div>
+        </div>
         <h1 className="text-3xl font-medium tracking-tight">{rec.title || "Untitled 107"}</h1>
-        <RequestStatus rec={rec} />
+        <RequestMetrics rec={rec} variant="inline" size="sm" />
         <p className="text-sm text-fg-muted">
           {rec.tar.requestType || "—"} · {rec.tar.priority || "priority?"} ·{" "}
           {rec.tar.mds || rec.tar.partNumber || "unidentified"}
@@ -46,8 +54,8 @@ function CasePage() {
       </div>
 
       <div className="flex gap-1 border-b border-border">
-        <TabButton active={tab === "work"} onClick={() => setTab("work")}>
-          Work
+        <TabButton active={tab === "request"} onClick={() => setTab("request")}>
+          Request
         </TabButton>
         <TabButton active={tab === "envelope"} onClick={() => setTab("envelope")}>
           Envelope
@@ -60,7 +68,7 @@ function CasePage() {
         </a>
       </div>
 
-      {tab === "work" ? (
+      {tab === "request" ? (
         <div className="grid gap-8 lg:grid-cols-2">
           <section className="space-y-3">
             <h2 className="text-lg font-medium tracking-tight">Triage</h2>

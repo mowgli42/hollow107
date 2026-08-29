@@ -19,6 +19,7 @@ type PageConfig = {
   title: string;
   stage: WorkflowStage | "open";
   showKanbanToggle?: boolean;
+  showSearch?: boolean;
 };
 
 export function QueuePage({
@@ -26,13 +27,16 @@ export function QueuePage({
   title,
   stage,
   showKanbanToggle = false,
+  showSearch = false,
 }: PageConfig) {
   const { data: cases, isLoading } = useOpsCases();
   const [sort, setSort] = useState<QueueSort>("critical");
+  const [query, setQuery] = useState("");
   const queueView = useOpsUi((s) => s.queueView);
   const setQueueView = useOpsUi((s) => s.setQueueView);
 
-  const filtered = (cases ?? []).filter((c) => matchesStage(c.status, stage));
+  const staged = (cases ?? []).filter((c) => matchesStage(c.status, stage));
+  const filtered = query.trim() ? staged.filter((c) => matchesSearch(c, query)) : staged;
   const list = sortQueue(filtered, sort);
   const kanban = showKanbanToggle && queueView === "kanban";
 
@@ -48,18 +52,35 @@ export function QueuePage({
         )}
       </div>
 
+      {showSearch && (
+        <label className="block">
+          <span className="sr-only">Search tickets</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search id, title, unit, POC, SN…"
+            className="min-h-11 w-full rounded-md border border-border-strong bg-bg-elevated px-3 text-sm"
+          />
+        </label>
+      )}
+
       {!kanban && (
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="font-mono text-xs tracking-widest text-fg-subtle uppercase">
             {filtered.length} {filtered.length === 1 ? "ticket" : "tickets"}
+            {query.trim() && staged.length !== filtered.length ? ` · ${staged.length} total` : ""}
           </p>
           <SortToggle sort={sort} onChange={setSort} />
         </div>
       )}
 
       {isLoading && <p className="text-sm text-fg-muted">Loading cases…</p>}
-      {!isLoading && filtered.length === 0 && (
-        <EmptyStage stage={stage} />
+      {!isLoading && staged.length === 0 && <EmptyStage stage={stage} />}
+      {!isLoading && staged.length > 0 && filtered.length === 0 && (
+        <p className="rounded-md border border-dashed border-border-strong px-4 py-10 text-center text-sm text-fg-muted">
+          No tickets match &ldquo;{query.trim()}&rdquo;.
+        </p>
       )}
       {!isLoading && filtered.length > 0 && kanban && <KanbanBoard cases={filtered} />}
       {!isLoading && filtered.length > 0 && !kanban && (
@@ -156,4 +177,28 @@ function EmptyStage({ stage }: { stage: WorkflowStage | "open" }) {
 
 export function filterCases(cases: PresentedCase[], stage: WorkflowStage | "open") {
   return cases.filter((c) => matchesStage(c.status, stage));
+}
+
+export function matchesSearch(rec: PresentedCase, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const haystack = [
+    rec.id,
+    rec.title,
+    rec.status,
+    rec.sourceName,
+    rec.sourceKind,
+    rec.tar.unit,
+    rec.tar.site,
+    rec.tar.pocName,
+    rec.tar.pocContact,
+    rec.tar.mds,
+    rec.tar.partNumber,
+    rec.tar.serialNumber,
+    rec.tar.description,
+    rec.tar.requestType,
+  ]
+    .join(" ")
+    .toLowerCase();
+  return q.split(/\s+/).every((term) => haystack.includes(term));
 }

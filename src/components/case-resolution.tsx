@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { nextActions, canPatchTar, canManageHypotheses, canEditQaNotes, type CaseRecord, type Role } from "@/lib/hollow107";
+import { canPatchTar, canManageHypotheses, canEditQaNotes, type CaseRecord, type Role } from "@/lib/hollow107";
 import { cn } from "@/lib/utils";
 import { useCaseMutations } from "@/hooks/use-ops";
 
@@ -7,18 +7,11 @@ export function CaseResolution({ rec, role }: { rec: CaseRecord; role: Role }) {
   const mutate = useCaseMutations(rec.id);
   const [text, setText] = useState("");
   const [kill, setKill] = useState("");
-  const actions = nextActions(rec, role);
   const engineerActive = canManageHypotheses(role, rec.status);
-  const qaActive = canEditQaNotes(role);
+  const qaActive = canEditQaNotes(role, rec.status);
 
   return (
     <div className="space-y-8">
-      {role !== "engineer" && rec.status !== "closed" && rec.status !== "rejected" && (
-        <p className="text-sm text-fg-subtle">
-          Signed in as {role.toUpperCase()}. Workflow actions are limited to your role.
-        </p>
-      )}
-
       {role === "engineer" && !engineerActive && (
         <p className="text-sm text-fg-subtle">Engineering actions unlock when this ticket is in the engineer queue.</p>
       )}
@@ -138,25 +131,6 @@ export function CaseResolution({ rec, role }: { rec: CaseRecord; role: Role }) {
         </p>
       )}
 
-      <div className="flex flex-wrap gap-2">
-        {actions.length === 0 && <p className="text-sm text-fg-subtle">No moves available in this role and status.</p>}
-        {actions.map((a) => {
-          const danger = a.to === "rejected" || a.to === "closed";
-          return (
-            <button
-              key={a.to}
-              type="button"
-              onClick={() => mutate.mutate({ action: "transition", to: a.to, role })}
-              className={cn(
-                "min-h-11 rounded-md px-4 text-sm font-medium",
-                danger ? "bg-bg-ink text-fg-invert" : "bg-accent text-accent-fg",
-              )}
-            >
-              {a.label}
-            </button>
-          );
-        })}
-      </div>
     </div>
   );
 }
