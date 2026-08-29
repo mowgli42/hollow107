@@ -2,6 +2,7 @@ import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-r
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
 import { Shell } from "@/components/shell";
+import { AppQueryProvider } from "@/lib/query";
 import appCss from "../styles.css?url";
 
 const APP_NAME = "Hollow107";
@@ -14,9 +15,9 @@ export const Route = createRootRoute({
       { title: APP_NAME },
       {
         name: "description",
-        content: "See how empty a field 107 really is. Ingest TAR XML, score hollowness, triage, then resolve as FSR, engineer, or QA.",
+        content: "TAR/MAR queue: ingest XML, show status, wait time, and criticality. Team landing APIs.",
       },
-      { name: "theme-color", content: "#f3efe6" },
+      { name: "theme-color", content: "#0c0f14" },
     ],
     links: [
       { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
@@ -27,7 +28,7 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap",
       },
     ],
   }),
@@ -39,9 +40,11 @@ export const Route = createRootRoute({
       <body>
         <PreviewHostBridge />
         <AuthProvider>
-          <Shell>
-            <Outlet />
-          </Shell>
+          <AppQueryProvider>
+            <Shell>
+              <Outlet />
+            </Shell>
+          </AppQueryProvider>
         </AuthProvider>
         <Scripts />
       </body>

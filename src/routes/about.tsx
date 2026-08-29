@@ -5,59 +5,42 @@ export const Route = createFileRoute("/about")({ component: About });
 function About() {
   return (
     <article className="mx-auto max-w-2xl space-y-8">
-      <header className="space-y-3">
-        <p className="font-mono text-xs tracking-widest text-accent uppercase">Graham-bell prototype</p>
-        <h1 className="font-display text-4xl font-medium tracking-tight text-balance">
-          Why Hollow107 exists
-        </h1>
+      <header className="space-y-2">
+        <p className="font-mono text-xs tracking-widest text-accent uppercase">Data plan</p>
+        <h1 className="text-3xl font-medium tracking-tight">XML in, envelope beside it</h1>
       </header>
-      <p className="text-lg leading-relaxed text-pretty text-fg-muted">
-        Field 107s (T.O. 00-25-107 TAR/MAR) arrive hollow: “box failed, please advise.”
-        The knowledge that would fill them was generated in the lab and during flight
-        test, then trapped in procedures nobody can query. This prototype shows the
-        emptiness first, then a triage-to-resolution path with FSR, engineer, and QA
-        views.
+      <p className="text-sm leading-relaxed text-fg-muted">
+        A 107 arrives and leaves as XML. Everything used to troubleshoot — who touched it, how long it sat, logs,
+        notes — lives next to that XML, not inside it.
       </p>
-
-      <section className="space-y-3">
-        <h2 className="font-display text-2xl font-medium tracking-tight">Open source search</h2>
-        <p className="leading-relaxed text-pretty text-fg-muted">
-          We searched GitHub for T.O. 00-25-107, TAR/MAR XML, JDRS, IMDS, and “field
-          service request” avionics tools. Nothing dedicated exists in the open. JDRS
-          and IMDS are closed government systems. Hits on “FSR” are AMD FidelityFX Super
-          Resolution and spaced-repetition schedulers. Adjacent ticket-triage and FSM
-          repos are generic helpdesks, not 107s.
-        </p>
-        <p className="leading-relaxed text-pretty text-fg-muted">
-          Hollow107 therefore uses an invented <code className="font-mono text-sm">TechnicalAssistanceRequest</code> XML
-          inspired by 107 content — not an official schema. Do not treat it as a
-          technical order.
-        </p>
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="font-display text-2xl font-medium tracking-tight">What this slice validates</h2>
-        <ul className="list-disc space-y-2 ps-5 text-fg-muted">
-          <li>Deterministic completeness scoring beats generating a diagnosis on a slogan.</li>
-          <li>Role-gated workflow: FSR fills gaps, engineer hypothesizes, QA stamps.</li>
-          <li>QA cannot close a hollow case. Engineer cannot start one.</li>
+      <section className="space-y-2">
+        <h2 className="text-xl font-medium">Interchange (XML)</h2>
+        <ul className="list-disc space-y-1 ps-5 text-sm text-fg-muted">
+          <li>Inbound: <code className="font-mono">TechnicalAssistanceRequest</code></li>
+          <li>Outbound: <code className="font-mono">TechnicalAssistanceResponse</code> (callback or disposition)</li>
+          <li>GET <code className="font-mono">/api/cases/:id/response.xml</code></li>
         </ul>
       </section>
-
-      <section className="space-y-3">
-        <h2 className="font-display text-2xl font-medium tracking-tight">What it does not</h2>
-        <ul className="list-disc space-y-2 ps-5 text-fg-muted">
-          <li>No Nemotron / local LLM yet — narrative callbacks are a production bead.</li>
-          <li>No Brain Book signature match, no real log decode.</li>
-          <li>Roles are a local toggle, not CAC/auth. State is this browser only.</li>
+      <section className="space-y-2">
+        <h2 className="text-xl font-medium">Envelope (not in XML)</h2>
+        <ul className="list-disc space-y-1 ps-5 text-sm text-fg-muted">
+          <li>Actors — submitter, assignee, watchers</li>
+          <li>Timeline — ingest, status moves, field updates, notes</li>
+          <li>Artifacts — log excerpts, later screenshots</li>
+          <li>Import runs — web vs folder vs API</li>
+          <li>Derived — unanswered clock, criticality</li>
         </ul>
       </section>
-
-      <p className="text-sm text-fg-subtle">
-        Spec: <code className="font-mono">openspec/</code> · Gherkin:{" "}
-        <code className="font-mono">features/</code> · Rebuild path:{" "}
-        <code className="font-mono">beads/roadmap.md</code> · Walkthrough:{" "}
-        <code className="font-mono">DEMO.md</code>
+      <section className="space-y-2">
+        <h2 className="text-xl font-medium">Team displays</h2>
+        <p className="text-sm text-fg-muted">
+          <code className="font-mono">POST /api/teams</code> creates a landing page at{" "}
+          <code className="font-mono">/t/:slug</code> and a filtered queue at{" "}
+          <code className="font-mono">/api/teams/:slug/cases</code>. Seeded: fsr, engineer, qa, ops.
+        </p>
+      </section>
+      <p className="text-xs text-fg-subtle">
+        Full write-up: <code className="font-mono">docs/DATA-PLAN.md</code>
       </p>
     </article>
   );

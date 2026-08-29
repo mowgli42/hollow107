@@ -11,8 +11,25 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as ClosedRouteImport } from './routes/closed'
+import { Route as EngineerRouteImport } from './routes/engineer'
+import { Route as IngestRouteImport } from './routes/ingest'
+import { Route as QaRouteImport } from './routes/qa'
 import { Route as QueueRouteImport } from './routes/queue'
+import { Route as TriageRouteImport } from './routes/triage'
+import { Route as ApiCasesRouteImport } from './routes/api/cases'
+import { Route as ApiIngestRouteImport } from './routes/api/ingest'
+import { Route as ApiSamplesRouteImport } from './routes/api/samples'
+import { Route as ApiStatusRouteImport } from './routes/api/status'
+import { Route as ApiTeamsRouteImport } from './routes/api/teams'
 import { Route as CasesIdRouteImport } from './routes/cases.$id'
+import { Route as TSlugRouteImport } from './routes/t.$slug'
+import { Route as ApiCasesIdRouteImport } from './routes/api/cases.$id'
+import { Route as ApiImportFolderRouteImport } from './routes/api/import.folder'
+import { Route as ApiTeamsSlugRouteImport } from './routes/api/teams.$slug'
+import { Route as ApiCasesIdEnvelopeRouteImport } from './routes/api/cases.$id.envelope'
+import { Route as ApiCasesIdResponseDotxmlRouteImport } from './routes/api/cases.$id.response[.]xml'
+import { Route as ApiTeamsSlugCasesRouteImport } from './routes/api/teams.$slug.cases'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -24,9 +41,59 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ClosedRoute = ClosedRouteImport.update({
+  id: '/closed',
+  path: '/closed',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EngineerRoute = EngineerRouteImport.update({
+  id: '/engineer',
+  path: '/engineer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IngestRoute = IngestRouteImport.update({
+  id: '/ingest',
+  path: '/ingest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QaRoute = QaRouteImport.update({
+  id: '/qa',
+  path: '/qa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QueueRoute = QueueRouteImport.update({
   id: '/queue',
   path: '/queue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TriageRoute = TriageRouteImport.update({
+  id: '/triage',
+  path: '/triage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCasesRoute = ApiCasesRouteImport.update({
+  id: '/api/cases',
+  path: '/api/cases',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiIngestRoute = ApiIngestRouteImport.update({
+  id: '/api/ingest',
+  path: '/api/ingest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSamplesRoute = ApiSamplesRouteImport.update({
+  id: '/api/samples',
+  path: '/api/samples',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiStatusRoute = ApiStatusRouteImport.update({
+  id: '/api/status',
+  path: '/api/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTeamsRoute = ApiTeamsRouteImport.update({
+  id: '/api/teams',
+  path: '/api/teams',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CasesIdRoute = CasesIdRouteImport.update({
@@ -34,39 +101,202 @@ const CasesIdRoute = CasesIdRouteImport.update({
   path: '/cases/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TSlugRoute = TSlugRouteImport.update({
+  id: '/t/$slug',
+  path: '/t/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiCasesIdRoute = ApiCasesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiCasesRoute,
+} as any)
+const ApiImportFolderRoute = ApiImportFolderRouteImport.update({
+  id: '/api/import/folder',
+  path: '/api/import/folder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTeamsSlugRoute = ApiTeamsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ApiTeamsRoute,
+} as any)
+const ApiCasesIdEnvelopeRoute = ApiCasesIdEnvelopeRouteImport.update({
+  id: '/envelope',
+  path: '/envelope',
+  getParentRoute: () => ApiCasesIdRoute,
+} as any)
+const ApiCasesIdResponseDotxmlRoute =
+  ApiCasesIdResponseDotxmlRouteImport.update({
+    id: '/response.xml',
+    path: '/response.xml',
+    getParentRoute: () => ApiCasesIdRoute,
+  } as any)
+const ApiTeamsSlugCasesRoute = ApiTeamsSlugCasesRouteImport.update({
+  id: '/cases',
+  path: '/cases',
+  getParentRoute: () => ApiTeamsSlugRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/closed': typeof ClosedRoute
+  '/engineer': typeof EngineerRoute
+  '/ingest': typeof IngestRoute
+  '/qa': typeof QaRoute
   '/queue': typeof QueueRoute
+  '/triage': typeof TriageRoute
+  '/api/cases': typeof ApiCasesRouteWithChildren
+  '/api/ingest': typeof ApiIngestRoute
+  '/api/samples': typeof ApiSamplesRoute
+  '/api/status': typeof ApiStatusRoute
+  '/api/teams': typeof ApiTeamsRouteWithChildren
   '/cases/$id': typeof CasesIdRoute
+  '/t/$slug': typeof TSlugRoute
+  '/api/cases/$id': typeof ApiCasesIdRouteWithChildren
+  '/api/import/folder': typeof ApiImportFolderRoute
+  '/api/teams/$slug': typeof ApiTeamsSlugRouteWithChildren
+  '/api/cases/$id/envelope': typeof ApiCasesIdEnvelopeRoute
+  '/api/cases/$id/response.xml': typeof ApiCasesIdResponseDotxmlRoute
+  '/api/teams/$slug/cases': typeof ApiTeamsSlugCasesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/closed': typeof ClosedRoute
+  '/engineer': typeof EngineerRoute
+  '/ingest': typeof IngestRoute
+  '/qa': typeof QaRoute
   '/queue': typeof QueueRoute
+  '/triage': typeof TriageRoute
+  '/api/cases': typeof ApiCasesRouteWithChildren
+  '/api/ingest': typeof ApiIngestRoute
+  '/api/samples': typeof ApiSamplesRoute
+  '/api/status': typeof ApiStatusRoute
+  '/api/teams': typeof ApiTeamsRouteWithChildren
   '/cases/$id': typeof CasesIdRoute
+  '/t/$slug': typeof TSlugRoute
+  '/api/cases/$id': typeof ApiCasesIdRouteWithChildren
+  '/api/import/folder': typeof ApiImportFolderRoute
+  '/api/teams/$slug': typeof ApiTeamsSlugRouteWithChildren
+  '/api/cases/$id/envelope': typeof ApiCasesIdEnvelopeRoute
+  '/api/cases/$id/response.xml': typeof ApiCasesIdResponseDotxmlRoute
+  '/api/teams/$slug/cases': typeof ApiTeamsSlugCasesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/closed': typeof ClosedRoute
+  '/engineer': typeof EngineerRoute
+  '/ingest': typeof IngestRoute
+  '/qa': typeof QaRoute
   '/queue': typeof QueueRoute
+  '/triage': typeof TriageRoute
+  '/api/cases': typeof ApiCasesRouteWithChildren
+  '/api/ingest': typeof ApiIngestRoute
+  '/api/samples': typeof ApiSamplesRoute
+  '/api/status': typeof ApiStatusRoute
+  '/api/teams': typeof ApiTeamsRouteWithChildren
   '/cases/$id': typeof CasesIdRoute
+  '/t/$slug': typeof TSlugRoute
+  '/api/cases/$id': typeof ApiCasesIdRouteWithChildren
+  '/api/import/folder': typeof ApiImportFolderRoute
+  '/api/teams/$slug': typeof ApiTeamsSlugRouteWithChildren
+  '/api/cases/$id/envelope': typeof ApiCasesIdEnvelopeRoute
+  '/api/cases/$id/response.xml': typeof ApiCasesIdResponseDotxmlRoute
+  '/api/teams/$slug/cases': typeof ApiTeamsSlugCasesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/queue' | '/cases/$id'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/closed'
+    | '/engineer'
+    | '/ingest'
+    | '/qa'
+    | '/queue'
+    | '/triage'
+    | '/api/cases'
+    | '/api/ingest'
+    | '/api/samples'
+    | '/api/status'
+    | '/api/teams'
+    | '/cases/$id'
+    | '/t/$slug'
+    | '/api/cases/$id'
+    | '/api/import/folder'
+    | '/api/teams/$slug'
+    | '/api/cases/$id/envelope'
+    | '/api/cases/$id/response.xml'
+    | '/api/teams/$slug/cases'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/queue' | '/cases/$id'
-  id: '__root__' | '/' | '/about' | '/queue' | '/cases/$id'
+  to:
+    | '/'
+    | '/about'
+    | '/closed'
+    | '/engineer'
+    | '/ingest'
+    | '/qa'
+    | '/queue'
+    | '/triage'
+    | '/api/cases'
+    | '/api/ingest'
+    | '/api/samples'
+    | '/api/status'
+    | '/api/teams'
+    | '/cases/$id'
+    | '/t/$slug'
+    | '/api/cases/$id'
+    | '/api/import/folder'
+    | '/api/teams/$slug'
+    | '/api/cases/$id/envelope'
+    | '/api/cases/$id/response.xml'
+    | '/api/teams/$slug/cases'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/closed'
+    | '/engineer'
+    | '/ingest'
+    | '/qa'
+    | '/queue'
+    | '/triage'
+    | '/api/cases'
+    | '/api/ingest'
+    | '/api/samples'
+    | '/api/status'
+    | '/api/teams'
+    | '/cases/$id'
+    | '/t/$slug'
+    | '/api/cases/$id'
+    | '/api/import/folder'
+    | '/api/teams/$slug'
+    | '/api/cases/$id/envelope'
+    | '/api/cases/$id/response.xml'
+    | '/api/teams/$slug/cases'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ClosedRoute: typeof ClosedRoute
+  EngineerRoute: typeof EngineerRoute
+  IngestRoute: typeof IngestRoute
+  QaRoute: typeof QaRoute
   QueueRoute: typeof QueueRoute
+  TriageRoute: typeof TriageRoute
+  ApiCasesRoute: typeof ApiCasesRouteWithChildren
+  ApiIngestRoute: typeof ApiIngestRoute
+  ApiSamplesRoute: typeof ApiSamplesRoute
+  ApiStatusRoute: typeof ApiStatusRoute
+  ApiTeamsRoute: typeof ApiTeamsRouteWithChildren
   CasesIdRoute: typeof CasesIdRoute
+  TSlugRoute: typeof TSlugRoute
+  ApiImportFolderRoute: typeof ApiImportFolderRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,11 +315,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/closed': {
+      id: '/closed'
+      path: '/closed'
+      fullPath: '/closed'
+      preLoaderRoute: typeof ClosedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/engineer': {
+      id: '/engineer'
+      path: '/engineer'
+      fullPath: '/engineer'
+      preLoaderRoute: typeof EngineerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ingest': {
+      id: '/ingest'
+      path: '/ingest'
+      fullPath: '/ingest'
+      preLoaderRoute: typeof IngestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/qa': {
+      id: '/qa'
+      path: '/qa'
+      fullPath: '/qa'
+      preLoaderRoute: typeof QaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/queue': {
       id: '/queue'
       path: '/queue'
       fullPath: '/queue'
       preLoaderRoute: typeof QueueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/triage': {
+      id: '/triage'
+      path: '/triage'
+      fullPath: '/triage'
+      preLoaderRoute: typeof TriageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cases': {
+      id: '/api/cases'
+      path: '/api/cases'
+      fullPath: '/api/cases'
+      preLoaderRoute: typeof ApiCasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/ingest': {
+      id: '/api/ingest'
+      path: '/api/ingest'
+      fullPath: '/api/ingest'
+      preLoaderRoute: typeof ApiIngestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/samples': {
+      id: '/api/samples'
+      path: '/api/samples'
+      fullPath: '/api/samples'
+      preLoaderRoute: typeof ApiSamplesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/status': {
+      id: '/api/status'
+      path: '/api/status'
+      fullPath: '/api/status'
+      preLoaderRoute: typeof ApiStatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/teams': {
+      id: '/api/teams'
+      path: '/api/teams'
+      fullPath: '/api/teams'
+      preLoaderRoute: typeof ApiTeamsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cases/$id': {
@@ -99,14 +399,125 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CasesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/t/$slug': {
+      id: '/t/$slug'
+      path: '/t/$slug'
+      fullPath: '/t/$slug'
+      preLoaderRoute: typeof TSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/cases/$id': {
+      id: '/api/cases/$id'
+      path: '/$id'
+      fullPath: '/api/cases/$id'
+      preLoaderRoute: typeof ApiCasesIdRouteImport
+      parentRoute: typeof ApiCasesRoute
+    }
+    '/api/import/folder': {
+      id: '/api/import/folder'
+      path: '/api/import/folder'
+      fullPath: '/api/import/folder'
+      preLoaderRoute: typeof ApiImportFolderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/teams/$slug': {
+      id: '/api/teams/$slug'
+      path: '/$slug'
+      fullPath: '/api/teams/$slug'
+      preLoaderRoute: typeof ApiTeamsSlugRouteImport
+      parentRoute: typeof ApiTeamsRoute
+    }
+    '/api/cases/$id/envelope': {
+      id: '/api/cases/$id/envelope'
+      path: '/envelope'
+      fullPath: '/api/cases/$id/envelope'
+      preLoaderRoute: typeof ApiCasesIdEnvelopeRouteImport
+      parentRoute: typeof ApiCasesIdRoute
+    }
+    '/api/cases/$id/response.xml': {
+      id: '/api/cases/$id/response.xml'
+      path: '/response.xml'
+      fullPath: '/api/cases/$id/response.xml'
+      preLoaderRoute: typeof ApiCasesIdResponseDotxmlRouteImport
+      parentRoute: typeof ApiCasesIdRoute
+    }
+    '/api/teams/$slug/cases': {
+      id: '/api/teams/$slug/cases'
+      path: '/cases'
+      fullPath: '/api/teams/$slug/cases'
+      preLoaderRoute: typeof ApiTeamsSlugCasesRouteImport
+      parentRoute: typeof ApiTeamsSlugRoute
+    }
   }
 }
+
+interface ApiCasesIdRouteChildren {
+  ApiCasesIdEnvelopeRoute: typeof ApiCasesIdEnvelopeRoute
+  ApiCasesIdResponseDotxmlRoute: typeof ApiCasesIdResponseDotxmlRoute
+}
+
+const ApiCasesIdRouteChildren: ApiCasesIdRouteChildren = {
+  ApiCasesIdEnvelopeRoute: ApiCasesIdEnvelopeRoute,
+  ApiCasesIdResponseDotxmlRoute: ApiCasesIdResponseDotxmlRoute,
+}
+
+const ApiCasesIdRouteWithChildren = ApiCasesIdRoute._addFileChildren(
+  ApiCasesIdRouteChildren,
+)
+
+interface ApiCasesRouteChildren {
+  ApiCasesIdRoute: typeof ApiCasesIdRouteWithChildren
+}
+
+const ApiCasesRouteChildren: ApiCasesRouteChildren = {
+  ApiCasesIdRoute: ApiCasesIdRouteWithChildren,
+}
+
+const ApiCasesRouteWithChildren = ApiCasesRoute._addFileChildren(
+  ApiCasesRouteChildren,
+)
+
+interface ApiTeamsSlugRouteChildren {
+  ApiTeamsSlugCasesRoute: typeof ApiTeamsSlugCasesRoute
+}
+
+const ApiTeamsSlugRouteChildren: ApiTeamsSlugRouteChildren = {
+  ApiTeamsSlugCasesRoute: ApiTeamsSlugCasesRoute,
+}
+
+const ApiTeamsSlugRouteWithChildren = ApiTeamsSlugRoute._addFileChildren(
+  ApiTeamsSlugRouteChildren,
+)
+
+interface ApiTeamsRouteChildren {
+  ApiTeamsSlugRoute: typeof ApiTeamsSlugRouteWithChildren
+}
+
+const ApiTeamsRouteChildren: ApiTeamsRouteChildren = {
+  ApiTeamsSlugRoute: ApiTeamsSlugRouteWithChildren,
+}
+
+const ApiTeamsRouteWithChildren = ApiTeamsRoute._addFileChildren(
+  ApiTeamsRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ClosedRoute: ClosedRoute,
+  EngineerRoute: EngineerRoute,
+  IngestRoute: IngestRoute,
+  QaRoute: QaRoute,
   QueueRoute: QueueRoute,
+  TriageRoute: TriageRoute,
+  ApiCasesRoute: ApiCasesRouteWithChildren,
+  ApiIngestRoute: ApiIngestRoute,
+  ApiSamplesRoute: ApiSamplesRoute,
+  ApiStatusRoute: ApiStatusRoute,
+  ApiTeamsRoute: ApiTeamsRouteWithChildren,
   CasesIdRoute: CasesIdRoute,
+  TSlugRoute: TSlugRoute,
+  ApiImportFolderRoute: ApiImportFolderRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

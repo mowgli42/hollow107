@@ -23,3 +23,8 @@ Auth is off. A three-button role switch is dishonest in production and honest in
 ## localStorage vs SQLite
 
 Persist the queue in the browser so a refresh does not dump the teaching set. No server database, no auth-scoped rows. Breaks across devices — acceptable for a two-minute demo, listed as bead 1.
+
+## Sales pitch vs queue
+
+The first cut led with a manifesto. Reviewers needed a queue: status, wait, criticality, ingest from a folder and a page, and APIs so other team UIs are not this React app. Envelope data (actors, timeline, logs) stays out of the XML on purpose.
+

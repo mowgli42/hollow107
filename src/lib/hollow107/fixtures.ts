@@ -77,3 +77,9 @@ export const SOLID_XML = `<?xml version="1.0" encoding="UTF-8"?>
   <logAttached>true</logAttached>
   <noLogReason></noLogReason>
 </TechnicalAssistanceRequest>`;
+
+export const SOLID_LOG = `# NAV-12A SN-14 OFP 12.3  2026-08-18T06:10:00Z
+PWR_ON t=0 temp_c=-18
+BIT 0x1A ALIGN_FAIL src=GPS-1
+GPS-2 ALIGN_OK t=12.4s
+WARM_START GPS-1 ALIGN_OK t=40.1s temp_c=-4`;
