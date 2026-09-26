@@ -25,3 +25,7 @@ artifacts/
 .node_modules.lock
 data/processed/
 data/failed/
+
+# Secrets (never commit private keys)
+*-key.pem
+*.key
